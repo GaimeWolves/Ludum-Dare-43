@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import gamewolves.itch.io.electrix.Main;
+import gamewolves.itch.io.electrix.objects.Battery;
 import gamewolves.itch.io.electrix.objects.Enemy;
 import gamewolves.itch.io.electrix.objects.Generator;
 import gamewolves.itch.io.electrix.objects.Shot;
@@ -31,6 +32,8 @@ import gamewolves.itch.io.electrix.objects.Player;
 
 public class Game extends State implements ControllerListener
 {
+    public static final float WaveTime = 45f;
+    public static final int WaveSize = 5;
     public static Game Instance;
 
     private Player player;
@@ -38,6 +41,7 @@ public class Game extends State implements ControllerListener
 
     public Array<Shot> shots;
     private Array<Enemy> enemies;
+    private Array<Battery> batteries;
 
     private Body worldCollider;
 
@@ -47,6 +51,8 @@ public class Game extends State implements ControllerListener
     private Animation<TextureRegion> energyBarAnimation;
 
     private Vector2 controllerAxis;
+
+    private float timer;
 
     public Game()
     {
@@ -64,8 +70,14 @@ public class Game extends State implements ControllerListener
         Instance = this;
         shots = new Array<>();
         enemies = new Array<>();
+        batteries = new Array<>();
 
-        enemies.add(new Enemy());
+        batteries.add(new Battery(new Vector2(0, 400)));
+
+        System.out.println(enemies.size);
+
+        for (int i = 0; i < WaveSize; i++)
+            enemies.add(new Enemy());
 
         world = new Texture(Gdx.files.internal("bg.png"));
         player = new Player();
@@ -245,9 +257,17 @@ public class Game extends State implements ControllerListener
         Physics.update(deltaTime);
         handleInput(deltaTime);
 
-        if (Math.round(Main.ElapsedTime) % 5 == 0)
-            enemies.add(new Enemy());
+        timer += deltaTime;
 
+        if (timer > WaveTime)
+        {
+            timer -= WaveTime;
+
+            for (int i = 0; i < WaveSize; i++)
+                enemies.add(new Enemy());
+        }
+
+        batteries.forEach(battery -> battery.update(deltaTime));
         player.update(deltaTime);
         generator.update(deltaTime);
 
@@ -271,6 +291,7 @@ public class Game extends State implements ControllerListener
         batch.draw(world, -world.getWidth() / 2, -world.getHeight() / 2);
 
         enemies.forEach(enemy -> enemy.render(batch));
+        batteries.forEach(battery -> battery.render(batch));
         batch.end();
 
         Physics.render();

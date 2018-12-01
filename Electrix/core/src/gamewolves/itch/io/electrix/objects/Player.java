@@ -143,7 +143,12 @@ public class Player
         else
             speed.scl(MaxSpeed);
 
-        body.setLinearVelocity(speed);
+
+            Vector2 dV = speed.cpy().sub(body.getLinearVelocity());
+
+            Vector2 f = dV.scl(body.getMass()).scl(1 / dt);
+
+            body.applyForceToCenter(f, true);
     }
 
     public void update(float dt)

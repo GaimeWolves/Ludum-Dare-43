@@ -60,7 +60,7 @@ public class Generator
         body.createFixture(fixtureDef);
 
         light = new PointLight(Physics.getRayHandler(), 500, new Color(0.25f, 0.25f, 0.25f, 0.5f), 10, 0, 0);
-        light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
+        light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskGenerator);
     }
 
     public void update(float dt)

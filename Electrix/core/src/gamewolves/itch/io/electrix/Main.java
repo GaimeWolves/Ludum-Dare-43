@@ -29,6 +29,8 @@ public class Main extends ApplicationAdapter
     private boolean isFullscreen;
 	private SpriteBatch batch;
 	private SpriteBatch uiBatch;
+
+	private boolean debug;
 	
 	@Override
 	public void create () {
@@ -36,6 +38,8 @@ public class Main extends ApplicationAdapter
 		uiBatch = new SpriteBatch();
 
 		isFullscreen = false;
+		debug = false;
+
         Gdx.graphics.setWindowedMode(Width, Heigth);
 
         Camera = new OrthographicCamera(1280, 720);
@@ -57,10 +61,14 @@ public class Main extends ApplicationAdapter
 
 		update();
 
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F2))
+		    debug = !debug;
+
         batch.setProjectionMatrix(Camera.combined);
         State.getCurrentState().render(batch);
         State.getCurrentState().renderUI(uiBatch);
-        debugRenderer.render(Physics.getWorld(), Camera.combined.cpy().scl(1 / Main.MPP, 1 / Main.MPP, 0));
+        if (debug)
+            debugRenderer.render(Physics.getWorld(), Camera.combined.cpy().scl(1 / Main.MPP, 1 / Main.MPP, 0));
 	}
 
 	private void update()

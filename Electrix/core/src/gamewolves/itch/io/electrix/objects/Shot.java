@@ -24,7 +24,7 @@ import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Shot
 {
-    private static final float Speed = 10;
+    private static final float Speed = 8;
 
     private static Texture shotTexture;
     private static Animation<TextureRegion> shotAnimation;
@@ -43,10 +43,10 @@ public class Shot
         {
             shotTexture = new Texture(Gdx.files.internal("shot.png"));
             Array<TextureRegion> frames = new Array<>();
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 4; i++)
                 frames.add(new TextureRegion(shotTexture, i * 8, 0, 8, 16));
 
-            shotAnimation = new Animation<>(0.25f, frames);
+            shotAnimation = new Animation<>(0.05f, frames);
             shotAnimation.setPlayMode(Animation.PlayMode.LOOP);
         }
 
@@ -79,7 +79,7 @@ public class Shot
 
         body.setTransform(position.scl(Main.MPP), 0);
 
-        light = new PointLight(Physics.getRayHandler(), 250, Color.WHITE, 0.25f, 0, 0);
+        light = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.5f), 0.5f, 0, 0);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
     }
 

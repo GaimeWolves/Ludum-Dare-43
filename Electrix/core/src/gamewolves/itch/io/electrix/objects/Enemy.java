@@ -22,7 +22,7 @@ import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Enemy
 {
-    private static final float Speed = 1f;
+    private static final float Speed = 0.5f;
     private AnimatedSprite enemy;
     private static Texture enemyTexture;
     private static Animation<TextureRegion> enemyAnimation;
