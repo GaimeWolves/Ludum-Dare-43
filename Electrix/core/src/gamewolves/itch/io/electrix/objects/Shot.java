@@ -108,4 +108,8 @@ public class Shot
     {
         shotTexture.dispose();
     }
+
+    public Body getBody() {
+        return body;
+    }
 }

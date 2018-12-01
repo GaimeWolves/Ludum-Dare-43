@@ -22,7 +22,7 @@ import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Enemy
 {
-    private static final float Speed = 2.5f;
+    private static final float Speed = 1f;
     private AnimatedSprite enemy;
     private static Texture enemyTexture;
     private static Animation<TextureRegion> enemyAnimation;
@@ -30,8 +30,12 @@ public class Enemy
     private Body body;
     public boolean disposeable;
 
+    public float lives;
+
     public Enemy()
     {
+        lives = 3;
+
         if (enemyTexture == null)
         {
             Array<TextureRegion> frames = new Array<>();
@@ -48,7 +52,7 @@ public class Enemy
 
         float angle = MathUtils.random() * 360;
 
-        Vector2 position = (new Vector2(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle))).scl(1000);
+        Vector2 position = (new Vector2(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle))).scl(5000 + MathUtils.random() * 500);
         enemy.setOriginBasedPosition(position.x, position.y);
         enemy.setRotation(angle - 180);
 
@@ -80,6 +84,9 @@ public class Enemy
     {
         body.setLinearVelocity(body.getPosition().nor().scl(-Speed));
         enemy.setOriginBasedPosition(body.getPosition().scl(1 / Main.MPP).x, body.getPosition().scl(1 / Main.MPP).y);
+
+        if (lives <= 0)
+            disposeable = true;
     }
 
     public void render(SpriteBatch batch)
@@ -95,5 +102,9 @@ public class Enemy
     public void dispose()
     {
         enemyTexture.dispose();
+    }
+
+    public Body getBody() {
+        return body;
     }
 }

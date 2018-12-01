@@ -44,6 +44,7 @@ public class Main extends ApplicationAdapter
         uiBatch.setProjectionMatrix(Camera.combined);
 
         Physics.init();
+        Physics.setContactListener();
         State.setCurrent(new Game());
 
         debugRenderer = new Box2DDebugRenderer();

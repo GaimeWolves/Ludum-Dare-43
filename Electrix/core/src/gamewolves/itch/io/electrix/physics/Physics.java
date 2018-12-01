@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import box2dLight.RayHandler;
 import gamewolves.itch.io.electrix.Main;
+import gamewolves.itch.io.electrix.states.Game;
 
 public class Physics
 {
@@ -54,7 +55,23 @@ public class Physics
             @Override
             public void beginContact(Contact contact)
             {
+                Fixture a = contact.getFixtureA();
+                Fixture b = contact.getFixtureB();
 
+                if (a.getFilterData().categoryBits == Filters.Sensor)
+                {
+                    Game.Instance.getShotByBody(a.getBody()).disposeable = true;
+
+                    if (b.getFilterData().categoryBits == Filters.Enemy)
+                        Game.Instance.getEnemyByBody(b.getBody()).lives--;
+                }
+                else if (b.getFilterData().categoryBits == Filters.Sensor)
+                {
+                    Game.Instance.getShotByBody(b.getBody()).disposeable = true;
+
+                    if (a.getFilterData().categoryBits == Filters.Enemy)
+                        Game.Instance.getEnemyByBody(a.getBody()).lives--;
+                }
             }
 
             @Override

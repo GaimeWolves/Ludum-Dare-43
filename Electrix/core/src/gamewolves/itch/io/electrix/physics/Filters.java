@@ -11,7 +11,7 @@ public class Filters
     public static final short CategoryNone = 0;
 
     public static final short MaskLight = AnyNoMask | Generator;
-    public static final short MaskSensor = Enemy | AnyNoMask;
+    public static final short MaskSensor = Enemy | AnyNoMask | Generator;
     public static final short MaskEnemy = Sensor | Generator;
     public static final short MaskGenerator = AnyNoMask | Sensor | Enemy | Player;
     public static final short MaskAny = Short.MAX_VALUE;
