@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import gamewolves.itch.io.electrix.Main;
+import gamewolves.itch.io.electrix.objects.Enemy;
 import gamewolves.itch.io.electrix.objects.Generator;
 import gamewolves.itch.io.electrix.objects.Shot;
 import gamewolves.itch.io.electrix.physics.Physics;
@@ -36,6 +37,7 @@ public class Game extends State implements ControllerListener
     private Generator generator;
 
     public Array<Shot> shots;
+    private Array<Enemy> enemies;
 
     private Texture world;
 
@@ -59,6 +61,9 @@ public class Game extends State implements ControllerListener
     {
         Instance = this;
         shots = new Array<>();
+        enemies = new Array<>();
+
+        enemies.add(new Enemy(), new Enemy(), new Enemy(), new Enemy());
 
         world = new Texture(Gdx.files.internal("bg.png"));
         player = new Player();
@@ -119,9 +124,13 @@ public class Game extends State implements ControllerListener
 
         for (int i = 0; i < shots.size; i++)
             if (shots.get(i).disposeable)
-                shots.removeIndex(i--);
+                shots.removeIndex(i--).delete();
 
-        System.out.println(shots.size);
+        enemies.forEach(enemy -> enemy.update(deltaTime));
+
+        for (int i = 0; i < enemies.size; i++)
+            if (enemies.get(i).disposeable)
+                enemies.removeIndex(i--).delete();
     }
 
     @Override
@@ -129,6 +138,8 @@ public class Game extends State implements ControllerListener
     {
         batch.begin();
         batch.draw(world, -world.getWidth() / 2, -world.getHeight() / 2);
+
+        enemies.forEach(enemy -> enemy.render(batch));
         batch.end();
 
         Physics.render();

@@ -31,7 +31,7 @@ public class Player
     private static final float MaxSpeed = 2.5f;
     private static final float MinSpeed = 1.25f;
     private static final float BaseEnergyLoss = .03f;
-    private static final float BaseEnergyGain = .25f;
+    private static final float BaseEnergyGain = .15f;
     private static final float MaxAngle = 45f;
 
     private AnimatedSprite sprite;
@@ -58,7 +58,7 @@ public class Player
         sprite.setPosition(Main.Camera.viewportWidth / 2, Main.Camera.viewportHeight / 2);
         sprite.play();
 
-        light = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 1), 10, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation(), MaxAngle);
+        light = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 0.5f), 10, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation(), MaxAngle);
         light.setSoft(true);
         light.setSoftnessLength(0.5f);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
@@ -102,8 +102,10 @@ public class Player
 
             if (Controllers.getControllers().first().getButton(5))
             {
-                if (!pressed)
+                if (!pressed) {
+                    energy -= 0.05;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
+                }
                 pressed = true;
             }
             else
@@ -123,8 +125,10 @@ public class Player
 
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
             {
-                if (!pressed)
+                if (!pressed) {
+                    energy -= 0.05;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
+                }
 
                 pressed = true;
             }

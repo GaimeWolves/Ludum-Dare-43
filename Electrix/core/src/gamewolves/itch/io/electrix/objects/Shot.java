@@ -24,7 +24,7 @@ import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Shot
 {
-    public static final float Speed = 10;
+    private static final float Speed = 10;
 
     private static Texture shotTexture;
     private static Animation<TextureRegion> shotAnimation;
@@ -75,7 +75,7 @@ public class Shot
         fixtureDef.filter.groupIndex = Filters.CategoryNone;
         fixtureDef.filter.maskBits = Filters.MaskSensor;
 
-        (body.createFixture(fixtureDef)).setUserData(1);
+        body.createFixture(fixtureDef);
 
         body.setTransform(position.scl(Main.MPP), 0);
 
@@ -100,7 +100,8 @@ public class Shot
 
     public void delete()
     {
-        light.dispose();
+        light.remove(true);
+        Physics.getWorld().destroyBody(body);
     }
 
     public void dispose()

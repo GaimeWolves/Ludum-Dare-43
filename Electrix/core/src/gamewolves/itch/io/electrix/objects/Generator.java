@@ -51,9 +51,15 @@ public class Generator
         PolygonShape shape = new PolygonShape();
         shape.setAsBox((generator.getWidth() / 2) * Main.MPP, (generator.getHeight() / 2) * Main.MPP);
 
-        body.createFixture(shape, 1);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.filter.maskBits = Filters.MaskAny;
+        fixtureDef.filter.groupIndex = 1;
+        fixtureDef.filter.categoryBits = Filters.Generator;
 
-        light = new PointLight(Physics.getRayHandler(), 500, new Color(0.5f, 0.5f, 0.5f, 1f), 6, 0, 0);
+        body.createFixture(fixtureDef);
+
+        light = new PointLight(Physics.getRayHandler(), 500, new Color(0.25f, 0.25f, 0.25f, 0.5f), 10, 0, 0);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
     }
 
