@@ -18,6 +18,8 @@ import gamewolves.itch.io.electrix.states.State;
 
 public class Main extends ApplicationAdapter
 {
+    public static final float MPP = 0.01f;
+
     public static float ElapsedTime;
 	public static OrthographicCamera Camera;
     public static int Width;
@@ -57,33 +59,8 @@ public class Main extends ApplicationAdapter
         batch.setProjectionMatrix(Camera.combined);
         State.getCurrentState().render(batch);
         State.getCurrentState().renderUI(uiBatch);
-        debugRenderer.render(Physics.getWorld(), Camera.combined);
+        debugRenderer.render(Physics.getWorld(), Camera.combined.cpy().scl(1 / Main.MPP, 1 / Main.MPP, 0));
 	}
-
-	public static Vector2 unproject(Vector2 input)
-    {
-        Vector3 unproject = Camera.unproject(new Vector3(input.x, input.y, 0));
-        return new Vector2(unproject.x, unproject.y);
-    }
-
-    public static Vector2 unproject(float x, float y)
-    {
-        Vector3 unproject = Camera.unproject(new Vector3(x, y, 0));
-        return new Vector2(unproject.x, unproject.y);
-    }
-
-    public static float unprojectX(float x)
-    {
-        Vector3 unproject = Camera.unproject(new Vector3(x, 0, 0));
-        return unproject.x;
-    }
-
-    public static float unprojectY(float y)
-    {
-        Vector3 unproject = Camera.unproject(new Vector3(0, y, 0));
-        unproject.add(500, -500, 0);
-        return unproject.y;
-    }
 
 	private void update()
     {

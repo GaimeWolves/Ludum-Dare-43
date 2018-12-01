@@ -37,7 +37,7 @@ public class Physics
 
     public static void render()
     {
-        rayHandler.setCombinedMatrix(Main.Camera);
+        rayHandler.setCombinedMatrix(Main.Camera.combined.cpy().scl(1 / Main.MPP, 1 / Main.MPP, 0), 0, 0, Main.Camera.viewportWidth, Main.Camera.viewportHeight);
         rayHandler.updateAndRender();
     }
 

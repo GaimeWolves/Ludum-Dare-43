@@ -8,9 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
@@ -19,12 +22,14 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 import box2dLight.ConeLight;
 import gamewolves.itch.io.electrix.Main;
 import gamewolves.itch.io.electrix.input.InputHandler;
+import gamewolves.itch.io.electrix.physics.Filters;
 import gamewolves.itch.io.electrix.physics.Physics;
+import gamewolves.itch.io.electrix.states.Game;
 
 public class Player
 {
-    private static final float MaxSpeed = 500;
-    private static final float MinSpeed = 100;
+    private static final float MaxSpeed = 2.5f;
+    private static final float MinSpeed = 1.25f;
     private static final float BaseEnergyLoss = .03f;
     private static final float BaseEnergyGain = .25f;
     private static final float MaxAngle = 45f;
@@ -34,6 +39,8 @@ public class Player
     private Animation<TextureRegion> playerIdle;
     private ConeLight light;
     private Body body;
+
+    private boolean pressed;
 
     private float energy;
 
@@ -51,9 +58,10 @@ public class Player
         sprite.setPosition(Main.Camera.viewportWidth / 2, Main.Camera.viewportHeight / 2);
         sprite.play();
 
-        light = new ConeLight(Physics.getRayHandler(), 500, new Color(0.8f, 0.8f, 0.8f, 1), 1000, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation(), MaxAngle);
+        light = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 1), 10, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation(), MaxAngle);
         light.setSoft(true);
-        light.setSoftnessLength(50);
+        light.setSoftnessLength(0.5f);
+        light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -62,15 +70,18 @@ public class Player
         body = Physics.getWorld().createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(sprite.getWidth() / 2, sprite.getHeight() / 2);
+        shape.setAsBox((sprite.getWidth() / 2) * Main.MPP, (sprite.getHeight() / 2) * Main.MPP);
 
-        body.createFixture(shape, 1);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.filter.categoryBits = Filters.Player;
+        fixtureDef.shape = shape;
 
-        body.setTransform(0, 100, 0);
+        body.createFixture(fixtureDef);
 
-
+        body.setTransform(0, 1, 0);
 
         energy = 1;
+        pressed = false;
     }
 
     public void handleInput(float dt, boolean isControllerConnected, Vector2 controllerSpeed)
@@ -80,22 +91,45 @@ public class Player
 
         Vector2 speed = new Vector2();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W))
-            speed.y = 1;
-        if (Gdx.input.isKeyPressed(Input.Keys.A))
-            speed.x = -1;
-        if (Gdx.input.isKeyPressed(Input.Keys.S))
-            speed.y = -1;
-        if (Gdx.input.isKeyPressed(Input.Keys.D))
-            speed.x = 1;
-
-        if (isControllerConnected) {
+        if (isControllerConnected)
+        {
             speed = controllerSpeed.cpy();
 
             Vector2 value = new Vector2(Controllers.getControllers().first().getAxis(1), -Controllers.getControllers().first().getAxis(0));
 
             if (value.len() > 0.05f)
                 sprite.setRotation(value.angle());
+
+            if (Controllers.getControllers().first().getButton(5))
+            {
+                if (!pressed)
+                    Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
+                pressed = true;
+            }
+            else
+                pressed = false;
+
+        }
+        else
+        {
+            if (Gdx.input.isKeyPressed(Input.Keys.W))
+                speed.y = 1;
+            if (Gdx.input.isKeyPressed(Input.Keys.A))
+                speed.x = -1;
+            if (Gdx.input.isKeyPressed(Input.Keys.S))
+                speed.y = -1;
+            if (Gdx.input.isKeyPressed(Input.Keys.D))
+                speed.x = 1;
+
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
+            {
+                if (!pressed)
+                    Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
+
+                pressed = true;
+            }
+            else
+                pressed = false;
         }
 
         speed.nor();
@@ -106,15 +140,15 @@ public class Player
 
     public void update(float dt)
     {
-        sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2, body.getPosition().y - sprite.getHeight() / 2);
+        sprite.setPosition(body.getPosition().x * (1 / Main.MPP) - sprite.getWidth() / 2, body.getPosition().y * (1 / Main.MPP) - sprite.getHeight() / 2);
         sprite.update(dt);
         light.setConeDegree(MaxAngle * energy);
         light.setDirection(sprite.getRotation());
-        light.setPosition(sprite.getX() + sprite.getOriginX(), sprite.getY() + sprite.getOriginY());
+        light.setPosition(body.getPosition());
 
         Main.Camera.position.set(sprite.getX() + sprite.getOriginX(), sprite.getY() + sprite.getOriginY(), 0);
 
-        if (body.getPosition().len() < 300)
+        if (body.getPosition().len() < 3)
             energy += BaseEnergyGain * dt;
 
         energy -= BaseEnergyLoss * dt;

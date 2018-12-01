@@ -24,13 +24,18 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import gamewolves.itch.io.electrix.Main;
 import gamewolves.itch.io.electrix.objects.Generator;
+import gamewolves.itch.io.electrix.objects.Shot;
 import gamewolves.itch.io.electrix.physics.Physics;
 import gamewolves.itch.io.electrix.objects.Player;
 
 public class Game extends State implements ControllerListener
 {
+    public static Game Instance;
+
     private Player player;
     private Generator generator;
+
+    public Array<Shot> shots;
 
     private Texture world;
 
@@ -52,6 +57,9 @@ public class Game extends State implements ControllerListener
     @Override
     public void init()
     {
+        Instance = this;
+        shots = new Array<>();
+
         world = new Texture(Gdx.files.internal("bg.png"));
         player = new Player();
         generator = new Generator();
@@ -96,19 +104,24 @@ public class Game extends State implements ControllerListener
     private void handleInput(float dt)
     {
         player.handleInput(dt, Controllers.getControllers().size > 0, controllerAxis);
-
-        //controllerAxis = Vector2.Zero.cpy();
     }
 
     @Override
     public void update(float deltaTime)
     {
+        Physics.update(deltaTime);
         handleInput(deltaTime);
 
         player.update(deltaTime);
         generator.update(deltaTime);
 
-        Physics.update(deltaTime);
+        shots.forEach(shot -> shot.update(deltaTime));
+
+        for (int i = 0; i < shots.size; i++)
+            if (shots.get(i).disposeable)
+                shots.removeIndex(i--);
+
+        System.out.println(shots.size);
     }
 
     @Override
@@ -121,6 +134,11 @@ public class Game extends State implements ControllerListener
         Physics.render();
 
         generator.render(batch);
+
+        batch.begin();
+        shots.forEach(shot -> shot.render(batch));
+        batch.end();
+
         player.render(batch);
     }
 

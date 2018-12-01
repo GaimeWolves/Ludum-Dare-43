@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
@@ -15,6 +16,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import box2dLight.PointLight;
 import gamewolves.itch.io.electrix.Main;
+import gamewolves.itch.io.electrix.physics.Filters;
 import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Generator
@@ -47,11 +49,12 @@ public class Generator
         body = Physics.getWorld().createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(generator.getWidth() / 2, generator.getHeight() / 2);
+        shape.setAsBox((generator.getWidth() / 2) * Main.MPP, (generator.getHeight() / 2) * Main.MPP);
 
         body.createFixture(shape, 1);
 
-        light = new PointLight(Physics.getRayHandler(), 500, new Color(0.5f, 0.5f, 0.5f, 1f), 600, 0, 0);
+        light = new PointLight(Physics.getRayHandler(), 500, new Color(0.5f, 0.5f, 0.5f, 1f), 6, 0, 0);
+        light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
     }
 
     public void update(float dt)
