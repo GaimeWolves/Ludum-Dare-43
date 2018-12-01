@@ -25,7 +25,7 @@ public class Physics
         RayHandler.useDiffuseLight(false);
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(Main.Camera);
-        rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 1f);
+        rayHandler.setAmbientLight(0f, 0f, 0f, 0f);
         rayHandler.setBlurNum(3);
         rayHandler.setShadows(true);
     }

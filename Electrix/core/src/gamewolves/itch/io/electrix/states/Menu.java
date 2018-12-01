@@ -43,6 +43,11 @@ public class Menu extends State
     }
 
     @Override
+    public void renderUI(SpriteBatch batch) {
+
+    }
+
+    @Override
     public void dispose()
     {
 
