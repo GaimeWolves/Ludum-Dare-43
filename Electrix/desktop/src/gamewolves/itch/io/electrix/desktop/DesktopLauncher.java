@@ -8,5 +8,12 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		new LwjglApplication(new Main(), config);
+
+		Main.calculateWindowSize();
+
+		config.useGL30 = false;
+		config.title = "Electrix";
+		config.vSyncEnabled = true;
+		config.resizable = false;
 	}
 }
