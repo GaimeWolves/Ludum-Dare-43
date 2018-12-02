@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import box2dLight.ConeLight;
+import box2dLight.PointLight;
 import gamewolves.itch.io.electrix.Main;
 import gamewolves.itch.io.electrix.input.InputHandler;
 import gamewolves.itch.io.electrix.physics.Filters;
@@ -38,6 +39,7 @@ public class Player
     private Texture playerIdleTexture;
     private Animation<TextureRegion> playerIdle;
     private ConeLight light;
+    private ConeLight light2;
     private Body body;
 
     private boolean pressed;
@@ -60,8 +62,13 @@ public class Player
 
         light = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 0.5f), 10, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation(), MaxAngle);
         light.setSoft(true);
-        light.setSoftnessLength(1f);
+        light.setSoftnessLength(0.6f);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
+
+        light2 = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 0.5f), 0.7f, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() - 180, 360 - MaxAngle);
+        light2.setSoft(true);
+        light2.setSoftnessLength(0.6f);
+        light2.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -102,7 +109,7 @@ public class Player
 
             if (Controllers.getControllers().first().getButton(5))
             {
-                if (!pressed) {
+                if (!pressed && energy > 0) {
                     energy -= 0.025;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
                 }
@@ -125,7 +132,7 @@ public class Player
 
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
             {
-                if (!pressed) {
+                if (!pressed && energy > 0) {
                     energy -= 0.025;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
                 }
@@ -155,16 +162,20 @@ public class Player
     {
         sprite.setPosition(body.getPosition().x * (1 / Main.MPP) - sprite.getWidth() / 2, body.getPosition().y * (1 / Main.MPP) - sprite.getHeight() / 2);
         sprite.update(dt);
-        light.setConeDegree(MaxAngle * energy);
+        light.setConeDegree(Math.max(MaxAngle * energy, 10));
+        light.setColor(new Color(0.6f, 0.6f, 0.4f, Math.max(0.5f * energy, 0.1f)));
         light.setDirection(sprite.getRotation());
+        light2.setDirection(sprite.getRotation() - 180);
+        light2.setConeDegree(360 - Math.max(MaxAngle * energy, 10));
         light.setPosition(body.getPosition());
+        light2.setPosition(body.getPosition());
 
         Main.Camera.position.set(sprite.getX() + sprite.getOriginX(), sprite.getY() + sprite.getOriginY(), 0);
 
         if (body.getPosition().len() < 3)
             energy += BaseEnergyGain * dt;
 
-        energy -= BaseEnergyLoss * dt;
+        //energy -= BaseEnergyLoss * dt;
         energy = Math.min(Math.max(energy, 0), 1);
     }
 

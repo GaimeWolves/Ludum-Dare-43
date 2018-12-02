@@ -1,6 +1,7 @@
 package gamewolves.itch.io.electrix.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -27,7 +28,8 @@ public class DefenceStation
     private AnimatedSprite sprite;
     private Body body;
 
-    private PointLight light;
+    private PointLight light1, light2;
+    public boolean charged;
 
     public DefenceStation(Vector2 position)
     {
@@ -43,7 +45,7 @@ public class DefenceStation
 
             frames = new Array<>();
             chargedTexture = new Texture(Gdx.files.internal("defence_charged.png"));
-            for (int i = 0; i < 13; i++)
+            for (int i = 0; i < 5; i++)
                 frames.add(new TextureRegion(chargedTexture, i * 196, 0, 196, 222));
 
             chargedAnimation = new Animation<>(0.1f, frames);
@@ -65,7 +67,7 @@ public class DefenceStation
         shape.setAsBox(26.5f * Main.MPP, 63 * Main.MPP, (new Vector2(-sprite.getWidth() / 2 + 26.5f, -sprite.getHeight() / 2 + 63).scl(Main.MPP)), 0);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.filter.categoryBits = Filters.Player;
+        fixtureDef.filter.categoryBits = Filters.Station;
         fixtureDef.filter.maskBits = Filters.MaskChargeStationBorder;
         fixtureDef.shape = shape;
 
@@ -90,7 +92,35 @@ public class DefenceStation
 
         body.createFixture(fixtureDef);
 
+        shape.setAsBox(44.5f * Main.MPP, 2 * Main.MPP, new Vector2(0, 10).scl(Main.MPP), 0);
+
+        fixtureDef.shape = shape;
+        fixtureDef.isSensor = true;
+        fixtureDef.filter.maskBits = Filters.MaskChargeStationSensor;
+
+        body.createFixture(fixtureDef);
+
         body.setTransform(position.scl(Main.MPP), 0);
+    }
+
+    public void update()
+    {
+        if (charged && light1 == null)
+        {
+            sprite.setAnimation(chargedAnimation);
+
+            light1 = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.5f), 4f, 0, 0);
+            light1.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
+
+            light2 = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.5f), 4f, 0, 0);
+            light2.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
+        }
+
+        if (light1 != null)
+        {
+            light1.setPosition(body.getPosition().sub(-0.75f, -0.7f));
+            light2.setPosition(body.getPosition().sub(0.75f, -0.7f));
+        }
     }
 
     public void render(SpriteBatch batch)
@@ -100,13 +130,19 @@ public class DefenceStation
 
     public void delete()
     {
-        if (light != null)
-            light.remove(true);
+        if (light1 != null) {
+            light1.remove(true);
+            light2.remove(true);
+        }
     }
 
     public void dispose()
     {
         idleTexture.dispose();
         chargedTexture.dispose();
+    }
+
+    public Body getBody() {
+        return body;
     }
 }

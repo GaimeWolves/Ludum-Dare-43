@@ -75,10 +75,6 @@ public class Game extends State implements ControllerListener
         batteries = new Array<>();
         stations = new Array<>();
 
-        batteries.add(new Battery(new Vector2(0, 400)));
-
-        stations.add(new DefenceStation(new Vector2(-500, 200)));
-
         for (int i = 0; i < WaveSize; i++)
             enemies.add(new Enemy());
 
@@ -103,6 +99,16 @@ public class Game extends State implements ControllerListener
 
     private void createWorld()
     {
+        stations.add(new DefenceStation(PixelToWorld(270, 210)));
+        stations.add(new DefenceStation(PixelToWorld(3090, 150)));
+        stations.add(new DefenceStation(PixelToWorld(3750, 2190)));
+        stations.add(new DefenceStation(PixelToWorld(690, 3210)));
+
+        batteries.add(new Battery(PixelToWorld(1530, 1050)));
+        batteries.add(new Battery(PixelToWorld(2820, 2400)));
+        batteries.add(new Battery(PixelToWorld(2070, 3690)));
+        batteries.add(new Battery(PixelToWorld(2760, 180)));
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
@@ -225,6 +231,16 @@ public class Game extends State implements ControllerListener
         shape.dispose();
     }
 
+    private Vector2 PixelToWorld(float x, float y)
+    {
+        y = world.getHeight() - y;
+
+        x -= world.getWidth() / 2;
+        y -= world.getHeight() / 2;
+
+        return new Vector2(x, y);
+    }
+
     @Override
     public void TouchEvent(Vector2 position)
     {
@@ -271,6 +287,8 @@ public class Game extends State implements ControllerListener
         }
 
         batteries.forEach(battery -> battery.update(deltaTime));
+        stations.forEach(DefenceStation::update);
+
         player.update(deltaTime);
         generator.update(deltaTime);
 
@@ -340,6 +358,22 @@ public class Game extends State implements ControllerListener
     public Enemy getEnemyByBody(Body body)
     {
         for (Enemy shot : enemies)
+            if (shot.getBody() == body)
+                return shot;
+        return null;
+    }
+
+    public Battery getBatteryByBody(Body body)
+    {
+        for (Battery shot : batteries)
+            if (shot.getBody() == body)
+                return shot;
+        return null;
+    }
+
+    public DefenceStation getStationByBody(Body body)
+    {
+        for (DefenceStation shot : stations)
             if (shot.getBody() == body)
                 return shot;
         return null;

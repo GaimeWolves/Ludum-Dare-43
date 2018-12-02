@@ -34,6 +34,7 @@ public class Battery
 
     private boolean locked;
     private boolean charged;
+    private boolean repelled;
 
     private float charge;
 
@@ -104,6 +105,17 @@ public class Battery
             light = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.25f), 1.5f, 0, 0);
             light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
         }
+
+        if (repelled)
+        {
+            repelled = false;
+            body.setTransform(body.getPosition().sub(0, 1.5f), 0);
+        }
+
+        if (locked && body.isActive())
+        {
+            body.setActive(false);
+        }
     }
 
     public void render(SpriteBatch batch)
@@ -121,5 +133,23 @@ public class Battery
     {
         chargedTexture.dispose();
         idleTexture.dispose();
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public boolean isCharged() {
+        return charged;
+    }
+
+    public void lock()
+    {
+        locked = true;
+    }
+
+    public void repell()
+    {
+        repelled = true;
     }
 }

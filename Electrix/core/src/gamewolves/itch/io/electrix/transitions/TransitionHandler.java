@@ -1,4 +1,4 @@
-package eu.masterofgames.dungeontower.transitions;
+package gamewolves.itch.io.electrix.transitions;
 
 public class TransitionHandler
 {

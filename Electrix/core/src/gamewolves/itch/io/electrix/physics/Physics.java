@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import box2dLight.RayHandler;
 import gamewolves.itch.io.electrix.Main;
+import gamewolves.itch.io.electrix.objects.Battery;
 import gamewolves.itch.io.electrix.states.Game;
 
 public class Physics
@@ -71,6 +72,29 @@ public class Physics
 
                     if (a.getFilterData().categoryBits == Filters.Enemy)
                         Game.Instance.getEnemyByBody(a.getBody()).lives--;
+                }
+
+                if (a.getFilterData().maskBits == Filters.MaskChargeStationSensor)
+                {
+                    Battery battery = (Game.Instance.getBatteryByBody(b.getBody()));
+                    if (battery.isCharged())
+                    {
+                        battery.lock();
+                        Game.Instance.getStationByBody(a.getBody()).charged = true;
+                    }
+                    else
+                        battery.repell();
+                }
+                else if (b.getFilterData().maskBits == Filters.MaskChargeStationSensor)
+                {
+                    Battery battery = (Game.Instance.getBatteryByBody(a.getBody()));
+                    if (battery.isCharged())
+                    {
+                        battery.lock();
+                        Game.Instance.getStationByBody(b.getBody()).charged = true;
+                    }
+                    else
+                        battery.repell();
                 }
             }
 
