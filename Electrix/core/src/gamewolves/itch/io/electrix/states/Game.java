@@ -24,6 +24,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 import gamewolves.itch.io.electrix.Main;
 import gamewolves.itch.io.electrix.objects.Battery;
+import gamewolves.itch.io.electrix.objects.DefenceStation;
 import gamewolves.itch.io.electrix.objects.Enemy;
 import gamewolves.itch.io.electrix.objects.Generator;
 import gamewolves.itch.io.electrix.objects.Shot;
@@ -42,6 +43,7 @@ public class Game extends State implements ControllerListener
     public Array<Shot> shots;
     private Array<Enemy> enemies;
     private Array<Battery> batteries;
+    private Array<DefenceStation> stations;
 
     private Body worldCollider;
 
@@ -71,10 +73,11 @@ public class Game extends State implements ControllerListener
         shots = new Array<>();
         enemies = new Array<>();
         batteries = new Array<>();
+        stations = new Array<>();
 
         batteries.add(new Battery(new Vector2(0, 400)));
 
-        System.out.println(enemies.size);
+        stations.add(new DefenceStation(new Vector2(-500, 200)));
 
         for (int i = 0; i < WaveSize; i++)
             enemies.add(new Enemy());
@@ -89,7 +92,7 @@ public class Game extends State implements ControllerListener
         energyFrame = new Texture(Gdx.files.internal("power_bar.png"));
         Array<TextureRegion> frames = new Array<>();
         energyBarTexture = new Texture(Gdx.files.internal("power_content.png"));
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 7; i++)
             frames.add(new TextureRegion(energyBarTexture, i * 32, 0, 32, 128));
 
         energyBarAnimation = new Animation<>(0.25f, frames);
@@ -290,8 +293,9 @@ public class Game extends State implements ControllerListener
         batch.begin();
         batch.draw(world, -world.getWidth() / 2, -world.getHeight() / 2);
 
-        enemies.forEach(enemy -> enemy.render(batch));
+        stations.forEach(station -> station.render(batch));
         batteries.forEach(battery -> battery.render(batch));
+        enemies.forEach(enemy -> enemy.render(batch));
         batch.end();
 
         Physics.render();

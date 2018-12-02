@@ -41,7 +41,7 @@ public class Enemy
             Array<TextureRegion> frames = new Array<>();
             enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
             for (int i = 0; i < 1; i++)
-                frames.add(new TextureRegion(enemyTexture, i * 32, 0, 32, 32));
+                frames.add(new TextureRegion(enemyTexture, i * 64, 0, 64, 64));
 
             enemyAnimation = new Animation<>(0.25f, frames);
             enemyAnimation.setPlayMode(Animation.PlayMode.LOOP);

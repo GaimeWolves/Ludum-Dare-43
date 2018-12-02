@@ -58,14 +58,14 @@ public class Physics
                 Fixture a = contact.getFixtureA();
                 Fixture b = contact.getFixtureB();
 
-                if (a.getFilterData().categoryBits == Filters.Sensor)
+                if (a.getFilterData().categoryBits == Filters.Shot)
                 {
                     Game.Instance.getShotByBody(a.getBody()).disposeable = true;
 
                     if (b.getFilterData().categoryBits == Filters.Enemy)
                         Game.Instance.getEnemyByBody(b.getBody()).lives--;
                 }
-                else if (b.getFilterData().categoryBits == Filters.Sensor)
+                else if (b.getFilterData().categoryBits == Filters.Shot)
                 {
                     Game.Instance.getShotByBody(b.getBody()).disposeable = true;
 

@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
@@ -71,9 +70,9 @@ public class Shot
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.isSensor = true;
-        fixtureDef.filter.categoryBits = Filters.Sensor;
+        fixtureDef.filter.categoryBits = Filters.Shot;
         fixtureDef.filter.groupIndex = Filters.CategoryNone;
-        fixtureDef.filter.maskBits = Filters.MaskSensor;
+        fixtureDef.filter.maskBits = Filters.MaskShot;
 
         body.createFixture(fixtureDef);
 

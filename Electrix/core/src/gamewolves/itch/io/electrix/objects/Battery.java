@@ -90,6 +90,9 @@ public class Battery
         body.setLinearVelocity(body.getLinearVelocity().scl(0.8f));
         battery.setOriginBasedPosition(body.getPosition().scl(1 / Main.MPP).x, body.getPosition().scl(1 / Main.MPP).y);
 
+        if (light != null)
+            light.setPosition(body.getPosition());
+
         if (body.getPosition().len() < 3)
             charge += dt;
 
@@ -98,7 +101,7 @@ public class Battery
             charged = true;
             battery.setAnimation(chargedAnimation);
 
-            light = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.5f), 0.5f, 0, 0);
+            light = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.25f), 1.5f, 0, 0);
             light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
         }
     }
@@ -108,11 +111,14 @@ public class Battery
         battery.draw(batch);
     }
 
-    public void dispose()
+    public void delete()
     {
         if (light != null)
             light.remove(true);
+    }
 
+    public void dispose()
+    {
         chargedTexture.dispose();
         idleTexture.dispose();
     }
