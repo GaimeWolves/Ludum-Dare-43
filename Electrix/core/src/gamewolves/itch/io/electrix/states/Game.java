@@ -32,6 +32,7 @@ import gamewolves.itch.io.electrix.objects.Powerup;
 import gamewolves.itch.io.electrix.objects.Shot;
 import gamewolves.itch.io.electrix.physics.Physics;
 import gamewolves.itch.io.electrix.objects.Player;
+import gamewolves.itch.io.electrix.transitions.TransitionHandler;
 
 public class Game extends State implements ControllerListener
 {
@@ -59,7 +60,9 @@ public class Game extends State implements ControllerListener
 
     private Vector2 controllerAxis;
 
-    private float timer;
+    private float timer, alpha;
+
+    public boolean won;
 
     public Game()
     {
@@ -74,6 +77,8 @@ public class Game extends State implements ControllerListener
     @Override
     public void init()
     {
+        alpha = 1;
+        won = true;
         Instance = this;
         shots = new Array<>();
         enemies = new Array<>();
@@ -322,6 +327,17 @@ public class Game extends State implements ControllerListener
             }
         }
 
+        if (generator.getHP() <= 0)
+        {
+            won = false;
+            TransitionHandler.setTransition(dt -> {
+                alpha -= dt;
+                alpha = Math.max(0, alpha);
+                return alpha <= 0;
+            }, () -> disposeable = true);
+        }
+
+
         player.update(deltaTime, chargeable);
         generator.update(deltaTime);
 
@@ -341,11 +357,27 @@ public class Game extends State implements ControllerListener
             if (enemy.attacking)
                 generator.damage(Enemy.Damage);
         });
+
+        boolean win = true;
+
+        for (DefenceStation station : stations)
+            if (!station.charged)
+                win = false;
+
+        if (win)
+        {
+            TransitionHandler.setTransition(dt -> {
+                alpha -= dt;
+                alpha = Math.max(0, alpha);
+                return alpha <= 0;
+            }, () -> disposeable = true);
+        }
     }
 
     @Override
     public void render(SpriteBatch batch)
     {
+        batch.setColor(1, 1, 1, alpha);
         batch.begin();
         batch.draw(world, -world.getWidth() / 2, -world.getHeight() / 2);
 
@@ -364,11 +396,14 @@ public class Game extends State implements ControllerListener
         batch.end();
 
         player.render(batch);
+
+        batch.setColor(1, 1, 1, 1);
     }
 
     @Override
     public void renderUI(SpriteBatch batch)
     {
+        batch.setColor(1, 1, 1, alpha);
         batch.begin();
         int srcY = (int)((1 - player.getEnergy()) * energyBarTexture.getHeight());
         int srcHeight = (int) (energyBarTexture.getHeight() - (1 - player.getEnergy()) * energyBarTexture.getHeight());
@@ -382,6 +417,7 @@ public class Game extends State implements ControllerListener
         batch.draw(generatorBarTexture, Main.Camera.viewportWidth / 2 - generatorFrameTexture.getWidth() / 2 + 17, Main.Camera.viewportHeight - 50 , 0, 0, (int)(generatorBarTexture.getWidth() * generator.getHP()), generatorBarTexture.getHeight());
 
         batch.end();
+        batch.setColor(1, 1, 1, 1);
     }
 
     @Override

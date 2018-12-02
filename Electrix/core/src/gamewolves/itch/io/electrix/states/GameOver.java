@@ -10,26 +10,28 @@ import com.badlogic.gdx.math.Vector2;
 import gamewolves.itch.io.electrix.Main;
 import gamewolves.itch.io.electrix.transitions.TransitionHandler;
 
-public class Menu extends State
+public class GameOver extends State
 {
     private Texture background;
-    private Rectangle playButton, quitButton;
+    private Rectangle quitButton;
     private float alpha;
 
     @Override
     public void init()
     {
         alpha = 1;
-        background = new Texture(Gdx.files.internal("background_menu.png"));
+        background = new Texture(Gdx.files.internal("gameover.png"));
 
-        playButton = new Rectangle(904 , 232, 297, 109);
-        quitButton = new Rectangle(904, 48, 297, 109);
+        quitButton = new Rectangle(388, 70, 517, 110);
+
+        Main.Camera.translate(Main.Camera.position.cpy().scl(-1));
+        Main.Camera.translate(Main.Camera.viewportWidth / 2, Main.Camera.viewportHeight / 2);
     }
 
     @Override
     public void TouchEvent(Vector2 position)
     {
-        if (playButton.contains(position))
+        if (quitButton.contains(position))
         {
             TransitionHandler.setTransition(deltaTime -> {
                 alpha -= deltaTime;
@@ -37,8 +39,6 @@ public class Menu extends State
                 return alpha <= 0;
             }, () -> disposeable = true);
         }
-        else if (quitButton.contains(position))
-            Gdx.app.exit();
     }
 
     @Override

@@ -14,8 +14,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import gamewolves.itch.io.electrix.input.InputHandler;
 import gamewolves.itch.io.electrix.physics.Physics;
 import gamewolves.itch.io.electrix.states.Game;
+import gamewolves.itch.io.electrix.states.GameOver;
 import gamewolves.itch.io.electrix.states.Menu;
 import gamewolves.itch.io.electrix.states.State;
+import gamewolves.itch.io.electrix.states.Win;
+import gamewolves.itch.io.electrix.transitions.TransitionHandler;
 
 public class Main extends ApplicationAdapter
 {
@@ -90,14 +93,28 @@ public class Main extends ApplicationAdapter
         Camera.update();
         InputHandler.update();
 
-        if(!State.getCurrentState().disposeable)
-            State.getCurrentState().update(Gdx.graphics.getDeltaTime());
-        else
-        {
-            State.getCurrentState().dispose();
-            if (State.getCurrentState().getClass() == Menu.class)
-            {
-                State.setCurrent(new Game());
+        if (TransitionHandler.inTransition())
+            TransitionHandler.update(Gdx.graphics.getDeltaTime());
+        else {
+            if (!State.getCurrentState().disposeable)
+                State.getCurrentState().update(Gdx.graphics.getDeltaTime());
+            else {
+                State.getCurrentState().dispose();
+                if (State.getCurrentState().getClass() == Menu.class) {
+                    State.setCurrent(new Game());
+                }
+                else if (State.getCurrentState().getClass() == Game.class) {
+                    if (Game.Instance.won)
+                        State.setCurrent(new Win());
+                    else
+                        State.setCurrent(new GameOver());
+                }
+                else if (State.getCurrentState().getClass() == Win.class) {
+                    State.setCurrent(new Menu());
+                }
+                else if (State.getCurrentState().getClass() == GameOver.class) {
+                    State.setCurrent(new Menu());
+                }
             }
         }
     }

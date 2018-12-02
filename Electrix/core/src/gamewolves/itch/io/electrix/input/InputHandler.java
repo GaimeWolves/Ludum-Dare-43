@@ -35,6 +35,8 @@ public class InputHandler
                 Main.Camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)).y
         );
 
+        System.out.println(CurrentMousePos);
+
         if (touchCallbacks.size == 0) return;
         if (Gdx.input.justTouched())
         {
