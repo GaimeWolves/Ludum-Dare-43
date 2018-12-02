@@ -1,6 +1,7 @@
 package gamewolves.itch.io.electrix.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -31,8 +32,13 @@ public class DefenceStation
     private PointLight light1, light2;
     public boolean charged;
 
+    private Sound generator;
+    private long id;
+
     public DefenceStation(Vector2 position)
     {
+        generator = Gdx.audio.newSound(Gdx.files.internal("sounds/generator.wav"));
+
         if (idleTexture == null)
         {
             Array<TextureRegion> frames = new Array<>();
@@ -103,8 +109,16 @@ public class DefenceStation
         body.setTransform(position.scl(Main.MPP), 0);
     }
 
-    public void update()
+    public void update(float volume)
     {
+        if (charged)
+        {
+            if (id == 0)
+                id = generator.loop();
+
+            generator.setVolume(id, volume);
+        }
+
         if (charged && light1 == null)
         {
             sprite.setAnimation(chargedAnimation);
@@ -134,6 +148,8 @@ public class DefenceStation
             light1.remove(true);
             light2.remove(true);
         }
+
+        generator.dispose();
     }
 
     public static void dispose()

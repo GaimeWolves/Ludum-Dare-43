@@ -310,7 +310,7 @@ public class Game extends State implements ControllerListener
         }
 
         batteries.forEach(battery -> battery.update(deltaTime));
-        stations.forEach(DefenceStation::update);
+        stations.forEach(station -> station.update(1f / station.getBody().getPosition().sub(player.getBody().getPosition()).len()));
 
         boolean chargeable = true;
 

@@ -1,7 +1,5 @@
 package gamewolves.itch.io.electrix.physics;
 
-import gamewolves.itch.io.electrix.states.State;
-
 public class Filters
 {
     public static final short AnyNoMask = 1;

@@ -176,7 +176,7 @@ public class Player
         if (body.getPosition().len() < 3 && chargeable)
             energy += BaseEnergyGain * dt;
 
-        //energy -= BaseEnergyLoss * dt;
+        energy -= BaseEnergyLoss * dt;
         energy = Math.min(Math.max(energy, 0), 1);
     }
 

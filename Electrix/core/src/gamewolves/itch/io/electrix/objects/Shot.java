@@ -1,6 +1,7 @@
 package gamewolves.itch.io.electrix.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -27,12 +28,14 @@ public class Shot
 
     private static Texture shotTexture;
     private static Animation<TextureRegion> shotAnimation;
+    private static Sound shotSound;
 
     private AnimatedSprite shot;
     private Vector2 direction;
 
     private Body body;
     private PointLight light;
+    private long id;
 
     public boolean disposeable;
 
@@ -40,6 +43,7 @@ public class Shot
     {
         if (shotTexture == null)
         {
+            shotSound = Gdx.audio.newSound(Gdx.files.internal("sounds/shot.wav"));
             shotTexture = new Texture(Gdx.files.internal("shot.png"));
             Array<TextureRegion> frames = new Array<>();
             for (int i = 0; i < 4; i++)
@@ -80,6 +84,8 @@ public class Shot
 
         light = new PointLight(Physics.getRayHandler(), 250, new Color(0.2f, 0.2f, 0.8f, 0.5f), 0.5f, 0, 0);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
+
+        id = shotSound.play(0.25f);
     }
 
     public void update(float dt)
@@ -106,6 +112,7 @@ public class Shot
     public static void dispose()
     {
         shotTexture.dispose();
+        shotSound.dispose();
     }
 
     public Body getBody() {
