@@ -103,7 +103,7 @@ public class Shot
         Physics.getWorld().destroyBody(body);
     }
 
-    public void dispose()
+    public static void dispose()
     {
         shotTexture.dispose();
     }

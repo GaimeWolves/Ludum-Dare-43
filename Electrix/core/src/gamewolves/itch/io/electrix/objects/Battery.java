@@ -129,7 +129,7 @@ public class Battery
             light.remove(true);
     }
 
-    public void dispose()
+    public static void dispose()
     {
         chargedTexture.dispose();
         idleTexture.dispose();

@@ -136,7 +136,7 @@ public class DefenceStation
         }
     }
 
-    public void dispose()
+    public static void dispose()
     {
         idleTexture.dispose();
         chargedTexture.dispose();

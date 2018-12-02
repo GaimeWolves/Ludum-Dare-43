@@ -339,7 +339,7 @@ public class Game extends State implements ControllerListener
 
 
         player.update(deltaTime, chargeable);
-        generator.update(deltaTime);
+        generator.update(deltaTime, 1f / player.getBody().getPosition().len());
 
         shots.forEach(shot -> shot.update(deltaTime));
 
@@ -423,7 +423,30 @@ public class Game extends State implements ControllerListener
     @Override
     public void dispose()
     {
+        for (int i = 0; i < shots.size; i++)
+            shots.removeIndex(i--).delete();
+        Shot.dispose();
 
+        for (int i = 0; i < enemies.size; i++)
+            enemies.removeIndex(i--).delete();
+        Enemy.dispose();
+
+        for (int i = 0; i < batteries.size; i++)
+            batteries.removeIndex(i--).delete();
+        Battery.dispose();
+
+        for (int i = 0; i < stations.size; i++)
+            stations.removeIndex(i--).delete();
+        DefenceStation.dispose();
+
+        for (int i = 0; i < powerups.size; i++)
+            powerups.removeIndex(i--).delete();
+        Powerup.dispose();
+
+        generatorFrameTexture.dispose();
+        generatorBarTexture.dispose();
+        energyBarTexture.dispose();
+        energyFrame.dispose();
     }
 
     public Shot getShotByBody(Body body)

@@ -102,7 +102,7 @@ public class Enemy
         Physics.getWorld().destroyBody(body);
     }
 
-    public void dispose()
+    public static void dispose()
     {
         enemyTexture.dispose();
     }

@@ -1,6 +1,7 @@
 package gamewolves.itch.io.electrix.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -29,8 +30,13 @@ public class Generator
     private Body body;
     private float hp;
 
+    private Sound rumble;
+    private long id;
+
     public Generator()
     {
+        rumble = Gdx.audio.newSound(Gdx.files.internal("sounds/generator.wav"));
+        id = rumble.loop();
         hp = 1;
         generatorTexture = new Texture(Gdx.files.internal("generator.png"));
 
@@ -65,10 +71,11 @@ public class Generator
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskGenerator);
     }
 
-    public void update(float dt)
+    public void update(float dt, float volume)
     {
         hp += dt * 0.0025f;
         hp = Math.max(Math.min(hp, 1), 0);
+        rumble.setVolume(id, volume);
     }
 
     public void render(SpriteBatch batch)
@@ -85,5 +92,12 @@ public class Generator
 
     public float getHP() {
         return hp;
+    }
+
+    public void dispose()
+    {
+        rumble.stop(id);
+        rumble.dispose();
+        generatorTexture.dispose();
     }
 }

@@ -67,7 +67,7 @@ public class Powerup
         light.remove(true);
     }
 
-    public void dispose()
+    public static void dispose()
     {
         powerupTexture.dispose();
     }

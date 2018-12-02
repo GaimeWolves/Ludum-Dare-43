@@ -18,7 +18,7 @@ public class Filters
     public static final short MaskShot = Enemy | AnyNoMask | Generator | Station;
     public static final short MaskEnemy = Shot | Generator;
     public static final short MaskGenerator = AnyNoMask | Shot | Enemy | Player;
-    public static final short MaskBattery = Player | AnyNoMask | Generator | Station;
+    public static final short MaskBattery = Player | AnyNoMask | Generator | Station | Battery;
     public static final short MaskChargeStationBorder = Player | Battery | Shot;
     public static final short MaskChargeStationPlayer = Player | Shot;
     public static final short MaskChargeStationSensor = Battery;
