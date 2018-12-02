@@ -22,6 +22,8 @@ import gamewolves.itch.io.electrix.physics.Physics;
 
 public class Enemy
 {
+    public static final float Damage = 0.0001f;
+
     private static final float Speed = 0.5f;
     private AnimatedSprite enemy;
     private static Texture enemyTexture;
@@ -29,6 +31,7 @@ public class Enemy
 
     private Body body;
     public boolean disposeable;
+    public boolean attacking;
 
     public float lives;
 
@@ -52,7 +55,7 @@ public class Enemy
 
         float angle = MathUtils.random() * 360;
 
-        Vector2 position = (new Vector2(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle))).scl(5000 + MathUtils.random() * 500);
+        Vector2 position = (new Vector2(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle))).scl(5000 + MathUtils.random() * 1000);
         enemy.setOriginBasedPosition(position.x, position.y);
         enemy.setRotation(angle - 180);
 

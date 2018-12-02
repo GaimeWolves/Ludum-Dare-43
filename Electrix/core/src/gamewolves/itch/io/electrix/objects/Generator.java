@@ -27,9 +27,11 @@ public class Generator
 
     private PointLight light;
     private Body body;
+    private float hp;
 
     public Generator()
     {
+        hp = 1;
         generatorTexture = new Texture(Gdx.files.internal("generator.png"));
 
         Array<TextureRegion> frames = new Array<>();
@@ -65,7 +67,8 @@ public class Generator
 
     public void update(float dt)
     {
-
+        hp += dt * 0.0025f;
+        hp = Math.max(Math.min(hp, 1), 0);
     }
 
     public void render(SpriteBatch batch)
@@ -73,5 +76,14 @@ public class Generator
         batch.begin();
         generator.draw(batch);
         batch.end();
+    }
+
+    public void damage(float dmg)
+    {
+        hp -= dmg;
+    }
+
+    public float getHP() {
+        return hp;
     }
 }

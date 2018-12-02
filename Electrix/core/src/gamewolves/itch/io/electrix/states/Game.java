@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -27,13 +28,14 @@ import gamewolves.itch.io.electrix.objects.Battery;
 import gamewolves.itch.io.electrix.objects.DefenceStation;
 import gamewolves.itch.io.electrix.objects.Enemy;
 import gamewolves.itch.io.electrix.objects.Generator;
+import gamewolves.itch.io.electrix.objects.Powerup;
 import gamewolves.itch.io.electrix.objects.Shot;
 import gamewolves.itch.io.electrix.physics.Physics;
 import gamewolves.itch.io.electrix.objects.Player;
 
 public class Game extends State implements ControllerListener
 {
-    public static final float WaveTime = 45f;
+    public static final float WaveTime = 60f;
     public static final int WaveSize = 5;
     public static Game Instance;
 
@@ -44,6 +46,7 @@ public class Game extends State implements ControllerListener
     private Array<Enemy> enemies;
     private Array<Battery> batteries;
     private Array<DefenceStation> stations;
+    private Array<Powerup> powerups;
 
     private Body worldCollider;
 
@@ -51,6 +54,8 @@ public class Game extends State implements ControllerListener
 
     private Texture energyFrame, energyBarTexture;
     private Animation<TextureRegion> energyBarAnimation;
+
+    private Texture generatorFrameTexture, generatorBarTexture;
 
     private Vector2 controllerAxis;
 
@@ -74,13 +79,15 @@ public class Game extends State implements ControllerListener
         enemies = new Array<>();
         batteries = new Array<>();
         stations = new Array<>();
-
-        for (int i = 0; i < WaveSize; i++)
-            enemies.add(new Enemy());
+        powerups = new Array<>();
 
         world = new Texture(Gdx.files.internal("bg.png"));
         player = new Player();
         generator = new Generator();
+
+        powerups.add(new Powerup(PixelToWorld(Powerup.SpawnPosition[MathUtils.random(Powerup.SpawnPosition.length - 1)])));
+        for (int i = 0; i < WaveSize; i++)
+            enemies.add(new Enemy());
 
         Controllers.addListener(this);
         controllerAxis = Vector2.Zero.cpy();
@@ -93,6 +100,9 @@ public class Game extends State implements ControllerListener
 
         energyBarAnimation = new Animation<>(0.25f, frames);
         energyBarAnimation.setPlayMode(Animation.PlayMode.LOOP);
+
+        generatorBarTexture = new Texture(Gdx.files.internal("generatorcontent.png"));
+        generatorFrameTexture = new Texture(Gdx.files.internal("generatorbar.png"));
 
         createWorld();
     }
@@ -241,6 +251,13 @@ public class Game extends State implements ControllerListener
         return new Vector2(x, y);
     }
 
+    private Vector2 PixelToWorld(Vector2 pixel)
+    {
+        Vector2 px = pixel.cpy();
+        px.y = world.getHeight() - px.y;
+        return px.sub(world.getWidth() / 2, world.getHeight() / 2);
+    }
+
     @Override
     public void TouchEvent(Vector2 position)
     {
@@ -282,6 +299,7 @@ public class Game extends State implements ControllerListener
         {
             timer -= WaveTime;
 
+            powerups.add(new Powerup(PixelToWorld(Powerup.SpawnPosition[MathUtils.random(Powerup.SpawnPosition.length - 1)])));
             for (int i = 0; i < WaveSize; i++)
                 enemies.add(new Enemy());
         }
@@ -289,7 +307,22 @@ public class Game extends State implements ControllerListener
         batteries.forEach(battery -> battery.update(deltaTime));
         stations.forEach(DefenceStation::update);
 
-        player.update(deltaTime);
+        boolean chargeable = true;
+
+        for (Battery battery : batteries)
+            if (battery.getBody().getPosition().len() < 3 && !battery.isCharged())
+                chargeable = false;
+
+        for (int i = 0; i < powerups.size; i++)
+        {
+            if (powerups.get(i).getSprite().getBoundingRectangle().overlaps(player.getSprite().getBoundingRectangle()))
+            {
+                player.addEnergy(Powerup.Charge);
+                powerups.removeIndex(i--).delete();
+            }
+        }
+
+        player.update(deltaTime, chargeable);
         generator.update(deltaTime);
 
         shots.forEach(shot -> shot.update(deltaTime));
@@ -303,6 +336,11 @@ public class Game extends State implements ControllerListener
         for (int i = 0; i < enemies.size; i++)
             if (enemies.get(i).disposeable)
                 enemies.removeIndex(i--).delete();
+
+        enemies.forEach(enemy -> {
+            if (enemy.attacking)
+                generator.damage(Enemy.Damage);
+        });
     }
 
     @Override
@@ -314,6 +352,7 @@ public class Game extends State implements ControllerListener
         stations.forEach(station -> station.render(batch));
         batteries.forEach(battery -> battery.render(batch));
         enemies.forEach(enemy -> enemy.render(batch));
+        powerups.forEach(powerup -> powerup.render(batch));
         batch.end();
 
         Physics.render();
@@ -338,6 +377,10 @@ public class Game extends State implements ControllerListener
         batch.draw(energyBarTexture, Main.Camera.viewportWidth - 10 - energyFrame.getWidth(), 10, currentFrame.getRegionX(), srcY, currentFrame.getRegionWidth(), srcHeight);
 
         batch.draw(energyFrame, Main.Camera.viewportWidth - 10 - energyFrame.getWidth(), 10);
+
+        batch.draw(generatorFrameTexture, Main.Camera.viewportWidth / 2 - generatorFrameTexture.getWidth() / 2, Main.Camera.viewportHeight - 50 - generatorFrameTexture.getHeight() / 2);
+        batch.draw(generatorBarTexture, Main.Camera.viewportWidth / 2 - generatorFrameTexture.getWidth() / 2 + 17, Main.Camera.viewportHeight - 50 , 0, 0, (int)(generatorBarTexture.getWidth() * generator.getHP()), generatorBarTexture.getHeight());
+
         batch.end();
     }
 
@@ -439,4 +482,6 @@ public class Game extends State implements ControllerListener
     public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
         return false;
     }
+
+
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import gamewolves.itch.io.electrix.input.InputHandler;
 import gamewolves.itch.io.electrix.physics.Physics;
 import gamewolves.itch.io.electrix.states.Game;
+import gamewolves.itch.io.electrix.states.Menu;
 import gamewolves.itch.io.electrix.states.State;
 
 public class Main extends ApplicationAdapter
@@ -49,7 +50,7 @@ public class Main extends ApplicationAdapter
 
         Physics.init();
         Physics.setContactListener();
-        State.setCurrent(new Game());
+        State.setCurrent(new Menu());
 
         debugRenderer = new Box2DDebugRenderer();
 	}
@@ -91,6 +92,14 @@ public class Main extends ApplicationAdapter
 
         if(!State.getCurrentState().disposeable)
             State.getCurrentState().update(Gdx.graphics.getDeltaTime());
+        else
+        {
+            State.getCurrentState().dispose();
+            if (State.getCurrentState().getClass() == Menu.class)
+            {
+                State.setCurrent(new Game());
+            }
+        }
     }
 
     public static void calculateWindowSize()

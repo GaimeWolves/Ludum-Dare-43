@@ -49,8 +49,8 @@ public class Player
     public Player()
     {
         Array<TextureRegion> frames = new Array<>();
-        playerIdleTexture = new Texture(Gdx.files.internal("player_idle.png"));
-        for (int i = 0; i < 4; i++)
+        playerIdleTexture = new Texture(Gdx.files.internal("player.png"));
+        for (int i = 0; i < 8; i++)
             frames.add(new TextureRegion(playerIdleTexture, i * 32, 0, 32, 32));
 
         playerIdle = new Animation<>(0.25f, frames);
@@ -65,7 +65,7 @@ public class Player
         light.setSoftnessLength(0.6f);
         light.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
 
-        light2 = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 0.5f), 0.7f, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() - 180, 360 - MaxAngle);
+        light2 = new ConeLight(Physics.getRayHandler(), 500, new Color(0.6f, 0.6f, 0.4f, 0.5f), 0.7f, sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() - 90, 180 - MaxAngle);
         light2.setSoft(true);
         light2.setSoftnessLength(0.6f);
         light2.setContactFilter(Filters.AnyNoMask, Filters.CategoryNone, Filters.MaskLight);
@@ -82,6 +82,7 @@ public class Player
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.filter.categoryBits = Filters.Player;
         fixtureDef.shape = shape;
+        fixtureDef.friction = 3f;
 
         body.createFixture(fixtureDef);
 
@@ -110,7 +111,7 @@ public class Player
             if (Controllers.getControllers().first().getButton(5))
             {
                 if (!pressed && energy > 0) {
-                    energy -= 0.025;
+                    energy -= 0.035;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
                 }
                 pressed = true;
@@ -133,7 +134,7 @@ public class Player
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
             {
                 if (!pressed && energy > 0) {
-                    energy -= 0.025;
+                    energy -= 0.035;
                     Game.Instance.shots.add(new Shot(body.getPosition().scl(1 / Main.MPP), new Vector2(MathUtils.cosDeg(sprite.getRotation()), MathUtils.sinDeg(sprite.getRotation()))));
                 }
 
@@ -158,7 +159,7 @@ public class Player
             body.applyForceToCenter(f, true);
     }
 
-    public void update(float dt)
+    public void update(float dt, boolean chargeable)
     {
         sprite.setPosition(body.getPosition().x * (1 / Main.MPP) - sprite.getWidth() / 2, body.getPosition().y * (1 / Main.MPP) - sprite.getHeight() / 2);
         sprite.update(dt);
@@ -166,16 +167,16 @@ public class Player
         light.setColor(new Color(0.6f, 0.6f, 0.4f, Math.max(0.5f * energy, 0.1f)));
         light.setDirection(sprite.getRotation());
         light2.setDirection(sprite.getRotation() - 180);
-        light2.setConeDegree(360 - Math.max(MaxAngle * energy, 10));
+        light2.setConeDegree(180 - Math.max(MaxAngle * energy, 10));
         light.setPosition(body.getPosition());
         light2.setPosition(body.getPosition());
 
         Main.Camera.position.set(sprite.getX() + sprite.getOriginX(), sprite.getY() + sprite.getOriginY(), 0);
 
-        if (body.getPosition().len() < 3)
+        if (body.getPosition().len() < 3 && chargeable)
             energy += BaseEnergyGain * dt;
 
-        //energy -= BaseEnergyLoss * dt;
+        energy -= BaseEnergyLoss * dt;
         energy = Math.min(Math.max(energy, 0), 1);
     }
 
@@ -189,5 +190,14 @@ public class Player
     public float getEnergy()
     {
         return energy;
+    }
+
+    public void addEnergy(float energy)
+    {
+        this.energy += energy;
+    }
+
+    public AnimatedSprite getSprite() {
+        return sprite;
     }
 }

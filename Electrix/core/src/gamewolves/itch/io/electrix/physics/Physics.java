@@ -96,12 +96,25 @@ public class Physics
                     else
                         battery.repell();
                 }
+
+                if (a.getFilterData().categoryBits == Filters.Enemy && b.getFilterData().categoryBits == Filters.Generator)
+                    Game.Instance.getEnemyByBody(a.getBody()).attacking = true;
+                else if (b.getFilterData().categoryBits == Filters.Enemy && a.getFilterData().categoryBits == Filters.Generator)
+                    Game.Instance.getEnemyByBody(b.getBody()).attacking = true;
             }
 
             @Override
             public void endContact(Contact contact)
             {
+                Fixture a = contact.getFixtureA();
+                Fixture b = contact.getFixtureB();
 
+                if (a.getFilterData().categoryBits == Filters.Enemy && b.getFilterData().categoryBits == Filters.Generator)
+                    if (Game.Instance.getEnemyByBody(a.getBody()) != null)
+                        Game.Instance.getEnemyByBody(a.getBody()).attacking = false;
+                else if (b.getFilterData().categoryBits == Filters.Enemy && a.getFilterData().categoryBits == Filters.Generator)
+                    if (Game.Instance.getEnemyByBody(b.getBody()) != null)
+                        Game.Instance.getEnemyByBody(b.getBody()).attacking = false;
             }
 
             @Override
